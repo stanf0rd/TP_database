@@ -9,22 +9,22 @@ class Database {
   async makeQuery(query) {
     const client = await this.pool.connect();
 
-    const result = {};
+    const response = {};
     try {
       await client.query('BEGIN');
 
-      // TODO: what does it returns?
-      result.result = await client.query(query);
+      response.result = await client.query(query);
 
       await client.query('COMMIT');
     } catch (err) {
-      result.err = err;
+      response.err = err;
+
       await client.query('ROLLBACK');
     } finally {
       client.release();
     }
 
-    return result;
+    return response;
   }
 }
 
