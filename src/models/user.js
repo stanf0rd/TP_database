@@ -29,7 +29,7 @@ class User {
   }
 
 
-  async getConflicted({ nickname, email }) {
+  async getConflicted(nickname, email) {
     const query = {
       // TODO: think: SELECT TOP 1 FROM ... ?
       text: `SELECT * FROM ${this.table}
@@ -43,16 +43,41 @@ class User {
   }
 
 
-  async get({ key, value }) {
+  async get(key, value) {
     const query = {
       // TODO: think: SELECT TOP 1 FROM ... ?
-      text: `SELECT * FROM ${this.table} WHERE ${key}='${value}';`,
+      text: `SELECT * FROM ${this.table}
+             WHERE ${key}='${value}'
+             LIMIT 1;`,
     };
 
     const { err, result } = await db.makeQuery(query);
-    if (err) throw new Error('Unable to get user');
+    if (err) return { err };
 
-    return { user: result.rows };
+    return { users: result.rows };
+  }
+
+
+  async update(user) {
+    const {
+      nickname,
+      fullname,
+      email,
+      about,
+    } = user;
+    const query = {
+      text: `UPDATE ${this.table}
+             SET fullname='${fullname}',
+                 email='${email}',
+                 about='${about}'
+             WHERE nickname='${nickname}';`,
+    };
+
+    const { err, result } = await db.makeQuery(query);
+
+    console.log(err, result);
+
+    return { err, result };
   }
 }
 
