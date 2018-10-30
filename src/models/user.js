@@ -18,8 +18,10 @@ class User {
 
     const query = {
       name: 'create_user',
-      text: `INSERT INTO ${this.table} (${this.rows.join(', ')})
-      VALUES($1, $2, $3, $4);`,
+      text: `
+        INSERT INTO ${this.table} (${this.rows.join(', ')})
+        VALUES($1, $2, $3, $4);
+      `,
       values: [nickname, fullname, email, about],
     };
 
@@ -32,9 +34,11 @@ class User {
   async getConflicted(nickname, email) {
     const query = {
       // TODO: think: SELECT TOP 1 FROM ... ?
-      text: `SELECT * FROM ${this.table}
-             WHERE nickname='${nickname}'
-             OR email='${email}';`,
+      text: `
+        SELECT * FROM ${this.table}
+        WHERE nickname='${nickname}'
+        OR email='${email}';
+      `,
     };
 
     const { err, result } = await db.makeQuery(query);
@@ -45,10 +49,10 @@ class User {
 
   async get(key, value) {
     const query = {
-      // TODO: think: SELECT TOP 1 FROM ... ?
-      text: `SELECT * FROM ${this.table}
-             WHERE ${key}='${value}'
-             LIMIT 1;`,
+      text: `
+        SELECT * FROM ${this.table}
+        WHERE ${key}='${value}';
+      `,
     };
 
     const { err, result } = await db.makeQuery(query);
@@ -58,24 +62,21 @@ class User {
   }
 
 
-  async update(user) {
-    const {
-      nickname,
-      fullname,
-      email,
-      about,
-    } = user;
+  async update(nickname, user) {
+    let params = '';
+    Object.keys(user).forEach((key) => {
+      params += `${key}='${user[key]}',`;
+    });
+
     const query = {
-      text: `UPDATE ${this.table}
-             SET fullname='${fullname}',
-                 email='${email}',
-                 about='${about}'
-             WHERE nickname='${nickname}';`,
+      text: `
+        UPDATE ${this.table}
+        SET ${params.substr(0, params.length - 1)}
+        WHERE nickname='${nickname}';
+      `,
     };
 
     const { err, result } = await db.makeQuery(query);
-
-    console.log(err, result);
 
     return { err, result };
   }
