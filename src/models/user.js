@@ -4,25 +4,25 @@ const db = require('../utils/database');
 class User {
   constructor() {
     this.table = 'forum_users';
-    this.rows = ['nickname', 'fullname', 'email', 'about'];
+    // this.rows = ['nickname', 'fullname', 'email', 'about'];
   }
 
 
   async create(user) {
     const {
       nickname,
-      fullname,
       email,
+      fullname,
       about,
     } = user;
 
     const query = {
       name: 'create_user',
       text: `
-        INSERT INTO ${this.table} (${this.rows.join(', ')})
+        INSERT INTO ${this.table}
         VALUES($1, $2, $3, $4);
       `,
-      values: [nickname, fullname, email, about],
+      values: [nickname, email, fullname, about],
     };
 
     const { err } = await db.makeQuery(query);
