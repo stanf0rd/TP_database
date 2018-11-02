@@ -4,7 +4,7 @@ const db = require('../utils/database');
 class Forum {
   constructor() {
     this.table = 'forums';
-    this.rows = ['title', 'slug', 'creator'];
+    this.rows = ['title', 'slug', '"user"'];
   }
 
 
@@ -14,21 +14,36 @@ class Forum {
     const query = {
       text: `
         INSERT INTO ${this.table} (${this.rows.join(', ')})
-        VALUES($1, $2, $3);
+        VALUES(
+          $1, $2, (SELECT nickname FROM forum_users WHERE nickname=$3)
+        )
+        RETURNING *;
       `,
       values: [title, slug, user],
     };
 
-    const { err } = await db.makeQuery(query);
+    const { err, result } = await db.makeQuery(query);
 
-    // TODO: maybe SELECT query?..
-    const createdForum = {
-      ...forumData,
-      posts: 0,
-      threads: 0,
+    if (err) return { err };
+
+    return { forum: result.rows[0] };
+  }
+
+
+  async get(key, value) {
+    const query = {
+      text: `
+        SELECT * FROM ${this.table}
+        WHERE ${key}='${value}';
+      `,
     };
 
-    return { err, forum: createdForum };
+    const { err, result } = await db.makeQuery(query);
+    if (err) return { err };
+
+    // console.log('in f_model', err, result);
+
+    return { forums: result.rows };
   }
 }
 
