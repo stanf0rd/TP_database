@@ -1,5 +1,10 @@
+const Thread = require('../controllers/thread');
+
 
 const threadRoutes = [
+  { method: 'post', url: '/forum/:forum/create', func: Thread.create },
+
+
   { method: 'post', url: '/thread/:name/create', func: () => null },
   // { method: 'post', url: '/thread/:id/create', func: () => null },
   // Создание новых постов
