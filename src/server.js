@@ -1,12 +1,10 @@
-const restana = require('restana');
-const parser  = require('body-parser');
+const fastify = require('fastify');
 const morgan  = require('morgan');
 
 const routes = require('./routes');
 
 
-const service = restana();
-service.use(parser.json());
+const service = fastify();
 service.use(morgan('dev'));
 
 
@@ -16,4 +14,4 @@ routes.forEach((route) => {
 });
 
 
-service.start(5000);
+service.listen(5000);

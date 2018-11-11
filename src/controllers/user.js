@@ -17,16 +17,16 @@ exports.create = async (req, res) => {
   }
 
   if (conflicted.users.length !== 0) {
-    res.body = conflicted.users;
-    res.send(409);
+    res.code(409);
+    res.send(conflicted.users);
     return;
   }
 
   const created = await User.create(userData);
   if (created.err) throw new Error('Unable to create user.', created.err);
 
-  res.body = created.user;
-  res.send(201);
+  res.code(201);
+  res.send(created.user);
 };
 
 
@@ -36,13 +36,13 @@ exports.get = async (req, res) => {
   if (err) throw new Error('Unable to get user', err);
 
   if (!users.length) {
-    res.body = { message: 'No such user' };
-    res.send(404);
+    res.code(404);
+    res.send({ message: 'No such user' });
     return;
   }
 
-  [res.body] = users;
-  res.send(200);
+  res.code(200);
+  res.send(users[0]);
 };
 
 
@@ -55,8 +55,8 @@ exports.update = async (req, res) => {
   if (found.err) throw new Error('Unable to get user', found.err);
   const [user] = found.users;
   if (!user) {
-    res.body = { message: 'No such user' };
-    res.send(404);
+    res.code(404);
+    res.send({ message: 'No such user' });
     return;
   }
 
@@ -69,16 +69,16 @@ exports.update = async (req, res) => {
     if (err) throw new Error('Unable to get user', err);
     if (!conflicted.length) newData.email = email;
     else {
-      res.body = { message: 'Conflict occured' };
-      res.send(409);
+      res.code(409);
+      res.send({ message: 'Conflict occured' });
       return;
     }
   }
 
   // check if data is empty
   if (Object.keys(newData).length === 0) {
-    res.body = user;
-    res.send(200);
+    res.code(200);
+    res.send(user);
     return;
   }
 
@@ -87,6 +87,6 @@ exports.update = async (req, res) => {
   if (err) throw new Error('Unable to update user', err);
 
   const updatedUser = { ...user, ...newData };
-  res.body = updatedUser;
-  res.send(200);
+  res.code(200);
+  res.send(updatedUser);
 };

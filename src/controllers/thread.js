@@ -17,6 +17,6 @@ exports.create = async (req, res) => {
 
   if (err) throw new Error('Unable to create thread');
 
-  res.body = thread;
-  res.send(201);
+  res.code(201);
+  res.send(thread);
 };

@@ -13,8 +13,8 @@ exports.create = async (req, res) =>  {
   if (err) {
     if (err.code === '23502') {
       // referenced row not found
-      res.body = { message: 'User not found' };
-      res.send(404);
+      res.code(404);
+      res.send({ message: 'User not found' });
       return;
     }
 
@@ -22,16 +22,16 @@ exports.create = async (req, res) =>  {
       // conflict
       const conflicts = await Forum.get('slug', forumData.slug);
       if (conflicts.err) throw new Error('Unable to get forum', conflicts.err);
-      [res.body] = conflicts.forums;
-      res.send(409);
+      res.code(409);
+      res.send(conflicts.forums[0]);
       return;
     }
 
     console.log(err);
   }
 
-  res.body = forum;
-  res.send(201);
+  res.code(201);
+  res.send(forum);
 };
 
 
@@ -42,23 +42,23 @@ exports.details = async (req, res) => {
   if (err) throw new Error('Unable to get forum details');
 
   if (!forums.length) {
-    res.body = { message: 'No such forum' };
-    res.send(404);
+    res.code(404);
+    res.send({ message: 'No such forum' });
     return;
   }
 
-  [res.body] = forums;
-  res.send(200);
+  res.code(200);
+  res.send(forums[0]);
 };
 
-// exports.newThread(req, res) {
 
-// }
+exports.threads = async (req, res) => {
+  console.log('req.params: ',req.params);
+  console.log('req.body: ', req.body);
+  console.log('req.query:', req.query);
+}
 
-// exports.users(req, res) {
 
-// }
+exports.users = async (req, res) => {
 
-// exports.threads(req, res) {
-
-// }
+}
