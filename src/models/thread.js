@@ -31,21 +31,28 @@ class Thread {
   }
 
 
-  // async get(key, value) {
-  //   const query = {
-  //     text: `
-  //       SELECT * FROM ${this.table}
-  //       WHERE ${key}='${value}';
-  //     `,
-  //   };
+  async get(key, value, options) {
+    const { limit, desc, since } = options;
 
-  //   const { err, result } = await db.makeQuery(query);
-  //   if (err) return { err };
+    const query = {
+      text: `
+        SELECT * FROM ${this.table}
+        WHERE ${key}='${value}'
+        ${ since ? `AND created < '${ since }' OR created = '${ since }'` : '' }
+        ORDER BY created ${ desc ? 'DESC' : 'ASC' }
+        ${ limit ? `LIMIT ${limit}` : '' }
+      `,
+    };
+    console.log(query.text);
 
-  //   // console.log('in f_model', err, result);
+    const { err, result } = await db.makeQuery(query);
+    if (err) {
+      console.log(err);
+      return { err };
+    }
 
-  //   return { forums: result.rows };
-  // }
+    return { threads: result.rows };
+  }
 }
 
 
