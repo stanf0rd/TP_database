@@ -15,7 +15,9 @@ class Forum {
       text: `
         INSERT INTO ${this.table} (${this.rows.join(', ')})
         VALUES(
-          $1, $2, (SELECT nickname FROM forum_users WHERE nickname=$3)
+          $1,
+          $2,
+          (SELECT nickname FROM "users" WHERE nickname=$3)
         )
         RETURNING *;
       `,

@@ -3,8 +3,7 @@ const db = require('../utils/database');
 
 class User {
   constructor() {
-    this.table = 'forum_users';
-    // this.rows = ['nickname', 'fullname', 'email', 'about'];
+    this.table = '"users"';
   }
 
 
@@ -33,7 +32,6 @@ class User {
 
   async getConflicted(nickname, email) {
     const query = {
-      // TODO: think: SELECT TOP 1 FROM ... ?
       text: `
         SELECT * FROM ${this.table}
         WHERE nickname='${nickname}'
@@ -63,15 +61,15 @@ class User {
 
 
   async update(nickname, user) {
-    let params = '';
+    const params = [];
     Object.keys(user).forEach((key) => {
-      params += `${key}='${user[key]}',`;
+      params.push(`${key}=$$${user[key]}$$`);
     });
 
     const query = {
       text: `
         UPDATE ${this.table}
-        SET ${params.substr(0, params.length - 1)}
+        SET ${params.join(', ')}
         WHERE nickname='${nickname}';
       `,
     };
