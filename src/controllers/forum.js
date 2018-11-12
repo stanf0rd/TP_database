@@ -1,5 +1,5 @@
 const Forum = require('../models/forum');
-
+const Thread = require('../models/thread');
 
 exports.create = async (req, res) =>  {
   const forumData = {
@@ -53,12 +53,29 @@ exports.details = async (req, res) => {
 
 
 exports.threads = async (req, res) => {
-  console.log('req.params: ',req.params);
-  console.log('req.body: ', req.body);
-  console.log('req.query:', req.query);
+  const { slug } = req.params;
+  const { limit, desc, since } = req.query;
+
+  const { err, threads } = await Thread.get(
+    'forum', slug, options = { limit, desc, since }
+  );
+
+  if (err) throw new Error('Unable to get forum threads');
+
+  console.log(threads);
+
+  if (!threads.length) {
+    res.code(404);
+    res.send({ message: 'No threads found' });
+    return;
+  }
+
+  res.code(200);
+  res.send(threads);
 }
 
 
 exports.users = async (req, res) => {
-
+  res.code(600);
+  res.send();
 }
