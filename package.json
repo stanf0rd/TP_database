@@ -2,14 +2,22 @@
   "name": "database",
   "version": "1.0.0",
   "description": "",
+  "watch": {
+    "start": {
+      "patterns": [
+        "*"
+      ],
+      "inherit": true
+    }
+  },
   "main": "src/server.js",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "cluster": "^0.7.7",
+    "fastify": "^1.13.3",
     "morgan": "^1.9.1",
     "node": "^10.12.0",
+    "npm-watch": "^0.5.0",
     "pg": "^7.6.0",
-    "restana": "^2.2.1",
     "turbo-http": "^0.3.0"
   },
   "devDependencies": {
@@ -19,7 +27,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "./start.sh"
+    "start": "./start.sh",
+    "watch": "npm-watch"
   },
   "author": "",
   "license": "ISC"
