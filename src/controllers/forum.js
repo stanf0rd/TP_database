@@ -62,12 +62,13 @@ exports.threads = async (req, res) => {
 
   if (err) throw new Error('Unable to get forum threads');
 
-  console.log(threads);
-
   if (!threads.length) {
-    res.code(404);
-    res.send({ message: 'No threads found' });
-    return;
+    const { forums } = await Forum.get('slug', slug);
+    if (!forums.length) {
+      res.code(404);
+      res.send({ message: 'No such forum' });
+      return;
+    }
   }
 
   res.code(200);

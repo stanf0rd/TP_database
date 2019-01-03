@@ -38,16 +38,20 @@ class Thread {
       text: `
         SELECT * FROM ${this.table}
         WHERE ${key}='${value}'
-        ${ since ? `AND created < '${ since }' OR created = '${ since }'` : '' }
-        ORDER BY created ${ desc ? 'DESC' : 'ASC' }
+        ${ since
+            ? desc === 'true'
+              ? `AND created <= '${ since }'`
+              : `AND created >= '${ since }'`
+            : ''
+        }
+        ORDER BY created ${ desc === 'true' ? 'DESC' : 'ASC' }
         ${ limit ? `LIMIT ${limit}` : '' }
-      `,
-    };
-    console.log(query.text);
+        `,
+      };
 
     const { err, result } = await db.makeQuery(query);
     if (err) {
-      console.log(err);
+      console.error(err);
       return { err };
     }
 
