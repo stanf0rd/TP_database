@@ -43,8 +43,6 @@ class Forum {
     const { err, result } = await db.makeQuery(query);
     if (err) return { err };
 
-    // console.log('in f_model', err, result);
-
     return { forums: result.rows };
   }
 }
