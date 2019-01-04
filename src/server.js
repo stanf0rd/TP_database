@@ -15,5 +15,3 @@ routes.forEach((route) => {
 
 
 service.listen(5000);
-
-console.log('started');
