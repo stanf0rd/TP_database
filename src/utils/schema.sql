@@ -2,6 +2,8 @@
 https://stackoverflow.com/questions/15981197/postgresql-error-type-citext-does-not-exist
 */
 
+CREATE EXTENSION IF NOT EXISTS citext;
+
 -- drop all
 DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS threads;
@@ -40,9 +42,13 @@ CREATE TABLE threads (
   forum      citext     NOT NULL    REFERENCES forums (slug),
   message    text       NOT NULL,
   votes      integer                DEFAULT 0,
-  slug       text                   DEFAULT NULL,
+  slug       citext                 DEFAULT NULL,
   created  timestamptz  NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );
+
+DROP INDEX IF EXISTS index_on_threads_slug;
+CREATE UNIQUE INDEX index_on_threads_slug
+  ON threads (slug);
 
 
 -- posts
