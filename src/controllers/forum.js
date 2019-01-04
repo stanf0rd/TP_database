@@ -57,7 +57,7 @@ exports.threads = async (req, res) => {
   const { limit, desc, since } = req.query;
 
   const { err, threads } = await Thread.get(
-    'forum', slug, options = { limit, desc, since }
+    'forum', slug, { limit, desc, since },
   );
 
   if (err) throw new Error('Unable to get forum threads');
@@ -73,10 +73,10 @@ exports.threads = async (req, res) => {
 
   res.code(200);
   res.send(threads);
-}
+};
 
 
 exports.users = async (req, res) => {
   res.code(600);
   res.send();
-}
+};
