@@ -35,21 +35,23 @@ class Thread {
 
 
   async get(key, value, options) {
-    if (!options) options = {};
-    const limit = 'limit' in options ? options.limit : null;
-    const desc = 'desc' in options ? options.desc : null;
-    const since = 'since' in options ? options.since : null;
+    const parsedOptions = options || {};
+    const limit = 'limit' in parsedOptions ? parsedOptions.limit : null;
+    const desc = 'desc' in parsedOptions ? parsedOptions.desc : null;
+    const since = 'since' in parsedOptions ? parsedOptions.since : null;
+
+    let sinceExpr;
+    if (since) {
+      sinceExpr = desc === 'true'
+        ? `AND created <= '${since}'`
+        : `AND created >= '${since}'`;
+    }
 
     const query = {
       text: `
         SELECT * FROM ${this.table}
         WHERE ${key}='${value}'
-        ${since
-            ? desc === 'true'
-              ? `AND created <= '${ since }'`
-              : `AND created >= '${ since }'`
-            : ''
-        }
+        ${sinceExpr || ''}
         ORDER BY created ${desc === 'true' ? 'DESC' : 'ASC'}
         ${limit ? `LIMIT ${limit}` : ''}
         `,
