@@ -1,4 +1,4 @@
-
+const Post = require('../controllers/post');
 
 const postRoutes = [
   { method: 'get', url: '/post/:id/details', func: () => null },

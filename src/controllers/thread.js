@@ -1,4 +1,5 @@
 const Thread = require('../models/thread');
+const Post = require('../models/post');
 
 
 exports.create = async (req, res) => {
@@ -19,4 +20,29 @@ exports.create = async (req, res) => {
 
   res.code(201);
   res.send(thread);
+};
+
+
+exports.createPosts = async (req, res) => {
+  console.log(req.body);
+  // console.log(req.params);
+  const newPosts = req.body;
+  const { slugOrId } = req.params;
+
+  // console.log(newPosts, slugOrId);
+
+  if (newPosts.length === 0) {
+    res.code(201);
+    res.send([]);
+    return;
+  }
+
+  const { err, posts } = await Post.create(slugOrId, newPosts);
+
+  console.log({ posts });
+
+  if (err) throw new Error('Unable to create posts');
+
+  res.code(201);
+  res.send(posts);
 };
