@@ -36,8 +36,6 @@ class Post {
       `,
     };
 
-    console.log(query.text);
-
     const { err, result } = await db.makeQuery(query);
     if (err) {
       console.log(err);

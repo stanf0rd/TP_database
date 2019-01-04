@@ -12,7 +12,11 @@ class Thread {
     const values = [];
     Object.keys(threadData).forEach((key) => {
       columns.push(key);
-      values.push(`$$${threadData[key]}$$`);
+      if (key === 'forum') {
+        values.push(`(SELECT slug FROM forums WHERE slug = '${threadData[key]}')`);
+      } else {
+        values.push(`$$${threadData[key]}$$`);
+      }
     });
 
     const query = {
@@ -23,6 +27,9 @@ class Thread {
       `,
     };
 
+    console.log(query.text);
+    
+
     const { err, result } = await db.makeQuery(query);
 
     if (err) return { err };
@@ -32,22 +39,25 @@ class Thread {
 
 
   async get(key, value, options) {
-    const { limit, desc, since } = options;
+    if (!options) options = {};
+    const limit = 'limit' in options ? options.limit : null;
+    const desc = 'desc' in options ? options.desc : null;
+    const since = 'since' in options ? options.since : null;
 
     const query = {
       text: `
         SELECT * FROM ${this.table}
         WHERE ${key}='${value}'
-        ${ since
+        ${since
             ? desc === 'true'
               ? `AND created <= '${ since }'`
               : `AND created >= '${ since }'`
             : ''
         }
-        ORDER BY created ${ desc === 'true' ? 'DESC' : 'ASC' }
-        ${ limit ? `LIMIT ${limit}` : '' }
+        ORDER BY created ${desc === 'true' ? 'DESC' : 'ASC'}
+        ${limit ? `LIMIT ${limit}` : ''}
         `,
-      };
+    };
 
     const { err, result } = await db.makeQuery(query);
     if (err) {
