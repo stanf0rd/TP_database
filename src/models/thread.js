@@ -27,11 +27,7 @@ class Thread {
       `,
     };
 
-    console.log(query.text);
-    
-
     const { err, result } = await db.makeQuery(query);
-
     if (err) return { err };
 
     return { thread: result.rows[0] };
