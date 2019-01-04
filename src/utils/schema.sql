@@ -3,6 +3,7 @@ https://stackoverflow.com/questions/15981197/postgresql-error-type-citext-does-n
 */
 
 -- drop all
+DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS threads;
 DROP TABLE IF EXISTS forums;
 DROP TABLE IF EXISTS "users";
@@ -17,7 +18,6 @@ CREATE TABLE "users" (
 );
 
 DROP INDEX IF EXISTS index_on_users_email;
-
 CREATE UNIQUE INDEX index_on_users_email
   ON "users" (email);
 
@@ -43,3 +43,29 @@ CREATE TABLE threads (
   slug       text                   DEFAULT NULL,
   created  timestamptz  NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );
+
+
+-- posts
+CREATE TABLE posts (
+  id         serial     NOT NULL    PRIMARY KEY,
+  parent     integer    DEFAULT 0   REFERENCES posts (id),
+  author     citext     NOT NULL    REFERENCES "users" (nickname),
+  message    text       NOT NULL,
+  isEdited   boolean    NOT NULL    DEFAULT false,
+  forum      citext     NOT NULL    REFERENCES forums (slug),
+  thread     integer    NOT NULL    REFERENCES threads (id),
+  created  timestamptz  NOT NULL    DEFAULT CURRENT_TIMESTAMP
+);
+
+
+INSERT INTO "users"
+VALUES (0, 0, 0, 0);
+
+INSERT INTO forums
+VALUES (0, 0, 0, 0, 0);
+
+INSERT INTO threads (id, title, author, forum, message)
+VALUES (0, 0, 0, 0, 0);
+
+INSERT INTO posts (id, parent, author, message, forum, thread)
+VALUES (0, 0, 0, 0, 0, 0);
