@@ -5,6 +5,7 @@ https://stackoverflow.com/questions/15981197/postgresql-error-type-citext-does-n
 CREATE EXTENSION IF NOT EXISTS citext;
 
 -- drop all
+DROP TABLE IF EXISTS votes;
 DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS threads;
 DROP TABLE IF EXISTS forums;
@@ -63,6 +64,17 @@ CREATE TABLE posts (
   created  timestamptz  NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );
 
+
+-- votes
+CREATE TABLE votes (
+  "user"     citext     NOT NULL    REFERENCES "users" (nickname),
+  forum      citext     NOT NULL    REFERENCES threads (slug),
+  vote       integer    NOT NULL    DEFAULT 0,
+  PRIMARY KEY ("user", forum)
+);
+
+
+-- default rows
 
 INSERT INTO "users"
 VALUES (0, 0, 0, 0);
