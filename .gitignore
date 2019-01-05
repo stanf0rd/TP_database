@@ -1,6 +1,7 @@
-# env files
-node_modules
+# work files
 .vscode
+node_modules
+start.sh
 
 # binaries
 tech-db-forum*
