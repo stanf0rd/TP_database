@@ -58,12 +58,26 @@ class Thread {
     };
 
     const { err, result } = await db.makeQuery(query);
-    if (err) {
-      console.error(err);
-      return { err };
-    }
+    if (err) return { err };
 
     return { threads: result.rows };
+  }
+
+
+  async vote(slugOrId, voice) {
+    const query = {
+      text: `
+        UPDATE ${this.table}
+        SET votes = votes+${voice}
+        WHERE slug = '${slugOrId}'
+        ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+        RETURNING *
+      `,
+    };
+
+    const { err, result } = await db.makeQuery(query);
+    if (err) return { err };
+    return { updated: result.rows[0] };
   }
 }
 

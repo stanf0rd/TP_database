@@ -1,4 +1,5 @@
 const Thread = require('../models/thread');
+const Vote = require('../models/vote');
 const Post = require('../models/post');
 
 
@@ -50,7 +51,6 @@ exports.create = async (req, res) => {
 
 
 exports.createPosts = async (req, res) => {
-  console.log(req.body);
   const newPosts = req.body;
   const { slugOrId } = req.params;
 
@@ -65,4 +65,35 @@ exports.createPosts = async (req, res) => {
 
   res.code(201);
   res.send(posts);
+};
+
+
+exports.vote = async (req, res) => {
+  const { nickname } = req.body;
+  let { voice } = req.body;
+  const { slugOrId } = req.params;
+
+  const { err, vote } = await Vote.getVote(slugOrId, nickname);
+
+  if (err) {
+    console.log(err);
+    throw new Error('Cannot get vote', err);
+  }
+
+  const upd = await Vote.addVote(slugOrId, nickname, voice);
+  if (upd.error) {
+    console.log(upd.error);
+    throw new Error('Cannot add new or update vote');
+  }
+
+  if (vote) voice -= vote.vote;
+
+  const thread = await Thread.vote(slugOrId, voice);
+  if (thread.err) {
+    console.log(thread.err);
+    throw new Error('Cannot vote thread', thread.err);
+  }
+
+  res.code(200);
+  res.send(thread.updated);
 };

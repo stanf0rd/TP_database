@@ -16,7 +16,7 @@ const threadRoutes = [
   { method: 'get', url: '/thread/:slugOrId/posts', func: () => null },
   // Сообщения данной ветви обсуждения
 
-  { method: 'post', url: '/thread/:slugOrId/vote', func: () => null },
+  { method: 'post', url: '/thread/:slugOrId/vote', func: Thread.vote },
   // Проголосовать за ветвь обсуждения
 ];
 
