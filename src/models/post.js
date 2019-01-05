@@ -37,11 +37,7 @@ class Post {
     };
 
     const { err, result } = await db.makeQuery(query);
-    if (err) {
-      console.log(err);
-      return { err };
-    }
-
+    if (err) return { err };
     return { posts: result.rows };
   }
 }
