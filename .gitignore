@@ -1,6 +1,6 @@
-# dev packages
-.eslintrc.json
+# env files
 node_modules
+.vscode
 
 # binaries
 tech-db-forum*
