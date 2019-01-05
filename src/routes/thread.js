@@ -7,7 +7,7 @@ const threadRoutes = [
   { method: 'post', url: '/thread/:slugOrId/create', func: Thread.createPosts },
   // Создание новых постов
 
-  { method: 'get', url: '/thread/:slugOrId/details', func: () => null },
+  { method: 'get', url: '/thread/:slugOrId/details', func: Thread.details },
   // Получение информации о ветке обсуждения
 
   { method: 'post', url: '/thread/:slugOrId/details', func: () => null },

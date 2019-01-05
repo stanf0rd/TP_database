@@ -61,7 +61,10 @@ exports.createPosts = async (req, res) => {
   }
 
   const { err, posts } = await Post.create(slugOrId, newPosts);
-  if (err) throw new Error('Unable to create posts');
+  if (err) {
+    console.log(err);
+    throw new Error('Unable to create posts');
+  }
 
   res.code(201);
   res.send(posts);
@@ -96,4 +99,19 @@ exports.vote = async (req, res) => {
 
   res.code(200);
   res.send(thread.updated);
+};
+
+
+exports.details = async (req, res) => {
+  const { slugOrId } = req.params;
+
+  const { err, thread } = await Thread.details(slugOrId);
+
+  if (err) {
+    console.log(err);
+    throw new Error('Unable to get thread details');
+  }
+
+  res.code(200);
+  res.send(thread);
 };

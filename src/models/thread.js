@@ -64,6 +64,21 @@ class Thread {
   }
 
 
+  async details(slugOrId) {
+    const query = {
+      text: `
+        SELECT * FROM ${this.table}
+        WHERE slug = '${slugOrId}'
+        ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+      `,
+    };
+
+    const { err, result } = await db.makeQuery(query);
+    if (err) return { err };
+    return { thread: result.rows[0] };
+  }
+
+
   async vote(slugOrId, voice) {
     const query = {
       text: `
