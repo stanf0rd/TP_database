@@ -16,12 +16,15 @@ class Post {
   async create(slugOrId, posts) {
     let values = '';
     posts.forEach((post) => {
-      values += post.parent ? post.parent : 'DEFAULT';
-      values += `, '${post.author}'`;
-      values += `, '${post.message}',
+      values += `(
+        ${post.parent ? post.parent : 'DEFAULT'},
+        '${post.author}',
+        '${post.message}',
         (SELECT id FROM thread),
-        (SELECT forum FROM thread)`;
+        (SELECT forum FROM thread)
+      ), `;
     });
+    values = values.slice(0, -2);
 
     const query = {
       text: `
@@ -32,7 +35,7 @@ class Post {
           ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
         )
         INSERT INTO ${this.table} (${this.columns.join(', ')})
-        VALUES (${values}) RETURNING *
+        VALUES ${values} RETURNING *
       `,
     };
 
