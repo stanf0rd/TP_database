@@ -65,6 +65,14 @@ CREATE TABLE posts (
   created  timestamptz  NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP INDEX IF EXISTS index_on_posts_path;
+CREATE UNIQUE INDEX index_on_posts_path
+  ON posts (path);
+
+DROP INDEX IF EXISTS index_on_posts_id;
+CREATE UNIQUE INDEX index_on_posts_id
+  ON posts (id);
+
 
 -- votes
 CREATE TABLE votes (
