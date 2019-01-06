@@ -10,7 +10,7 @@ const threadRoutes = [
   { method: 'get', url: '/thread/:slugOrId/details', func: Thread.details },
   // Получение информации о ветке обсуждения
 
-  { method: 'post', url: '/thread/:slugOrId/details', func: () => null },
+  { method: 'post', url: '/thread/:slugOrId/details', func: Thread.update },
   // Обновление ветки
 
   { method: 'get', url: '/thread/:slugOrId/posts', func: Thread.posts },

@@ -84,7 +84,6 @@ CREATE TABLE votes (
 
 
 -- default rows
-
 INSERT INTO "users"
 VALUES (0, 0, 0, 0);
 
@@ -96,3 +95,41 @@ VALUES (0, 0, 0, 0, 0);
 
 INSERT INTO posts (id, parent, path, author, message, forum, thread)
 VALUES (0, 0, '{}', 0, 0, 0, 0);
+
+
+-- new post trigger
+DROP FUNCTION IF EXISTS new_post;
+
+CREATE FUNCTION new_post() RETURNS trigger AS $new_post$
+    BEGIN
+        UPDATE forums
+           SET posts = posts + 1
+         WHERE slug = NEW.forum;
+
+        -- UPDATE threads
+          --  SET posts = posts + 1
+        --  WHERE id = NEW.thread;
+
+        RETURN NEW;
+    END;
+$new_post$ LANGUAGE plpgsql;
+
+CREATE TRIGGER new_post BEFORE INSERT ON posts
+    FOR EACH ROW EXECUTE PROCEDURE new_post();
+
+
+-- new thread trigger
+DROP FUNCTION IF EXISTS new_thread;
+
+CREATE FUNCTION new_thread() RETURNS trigger AS $new_thread$
+    BEGIN
+        UPDATE forums
+           SET threads = threads + 1
+         WHERE slug = NEW.forum;
+
+        RETURN NEW;
+    END;
+$new_thread$ LANGUAGE plpgsql;
+
+CREATE TRIGGER new_thread BEFORE INSERT ON threads
+    FOR EACH ROW EXECUTE PROCEDURE new_thread();
