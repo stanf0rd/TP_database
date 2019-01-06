@@ -115,3 +115,15 @@ exports.details = async (req, res) => {
   res.code(200);
   res.send(thread);
 };
+
+
+exports.posts = async (req, res) => {
+  const { slugOrId } = req.params;
+
+  const { err, posts } = await Post.get(slugOrId, req.query);
+
+  // console.log(err, posts);
+
+  res.code(200);
+  res.send(posts);
+};

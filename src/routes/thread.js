@@ -13,7 +13,7 @@ const threadRoutes = [
   { method: 'post', url: '/thread/:slugOrId/details', func: () => null },
   // Обновление ветки
 
-  { method: 'get', url: '/thread/:slugOrId/posts', func: () => null },
+  { method: 'get', url: '/thread/:slugOrId/posts', func: Thread.posts },
   // Сообщения данной ветви обсуждения
 
   { method: 'post', url: '/thread/:slugOrId/vote', func: Thread.vote },
