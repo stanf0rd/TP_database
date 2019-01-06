@@ -94,6 +94,25 @@ class Thread {
     if (err) return { err };
     return { updated: result.rows[0] };
   }
+
+
+  async update(slugOrId, { title, message }) {
+    const query = {
+      text: `
+        UPDATE ${this.table}
+        SET
+          ${title ? `title = '${title}'` : ''}${title && message ? ',' : ''}
+          ${message ? `message = '${message}'` : ''}
+        WHERE slug = '${slugOrId}'
+        ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+        RETURNING *
+      `,
+    };
+
+    const { err, result } = await db.makeQuery(query);
+    if (err) return { err };
+    return { thread: result.rows[0] };
+  }
 }
 
 

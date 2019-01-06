@@ -130,3 +130,29 @@ exports.posts = async (req, res) => {
   res.code(200);
   res.send(posts);
 };
+
+
+exports.update = async (req, res) => {
+  const { slugOrId } = req.params;
+
+  const { title, message } = req.body;
+  if (!title && !message) {
+    const { err, thread } = await Thread.details(slugOrId);
+    if (err) {
+      console.log(err);
+      throw new Error('Unable to get thread details');
+    }
+    res.code(200);
+    res.send(thread);
+    return;
+  }
+
+  const { err, thread } = await Thread.update(slugOrId, { title, message });
+  if (err) {
+    console.log(err);
+    throw new Error('Unable to update thread');
+  }
+
+  res.code(200);
+  res.send(thread);
+};
