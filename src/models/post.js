@@ -87,7 +87,7 @@ class Post {
       let treeSinceExpr = '';
       if (since) {
         treeSinceExpr = `
-        AND path > (
+        AND path ${desc === 'true' ? '<' : '>'} (
           SELECT path FROM ${this.table}
           WHERE id = '${since}'
         )
@@ -142,7 +142,7 @@ class Post {
       throw new Error('Unknown sort type');
     }
 
-    // console.log(query.text);
+    console.log(query.text);
 
     const { err, result } = await db.makeQuery(query);
     if (err) return (err);
