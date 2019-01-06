@@ -122,7 +122,10 @@ exports.posts = async (req, res) => {
 
   const { err, posts } = await Post.get(slugOrId, req.query);
 
-  // console.log(err, posts);
+  if (err) {
+    console.log(err);
+    throw new Error('Unable to get thread posts');
+  }
 
   res.code(200);
   res.send(posts);

@@ -62,19 +62,38 @@ class Post {
     const query = {};
 
     if (!sort || sort === 'flat') {
+      let sinceExpr = '';
+      if (since) {
+        sinceExpr = desc === 'true'
+          ? `AND id < '${since}'`
+          : `AND id > '${since}'`;
+      }
+
       query.text = `
         SELECT * FROM ${this.table}
         WHERE thread = (
           SELECT id FROM threads
           WHERE slug = '${slugOrId}'
           ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+          LIMIT 1
         )
+        ${sinceExpr}
         ORDER BY
           created ${desc === 'true' ? 'DESC' : 'ASC'},
           id ${desc === 'true' ? 'DESC' : 'ASC'}
         LIMIT ${limit}
       `;
     } else if (sort === 'tree') {
+      let treeSinceExpr = '';
+      if (since) {
+        treeSinceExpr = `
+        AND path > (
+          SELECT path FROM ${this.table}
+          WHERE id = '${since}'
+        )
+        `;
+      }
+
       query.text = `
         SELECT *
         FROM posts
@@ -82,20 +101,35 @@ class Post {
           SELECT id FROM threads
           WHERE slug = '${slugOrId}'
           ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+          LIMIT 1
         )
+        ${treeSinceExpr}
         ORDER BY path ${desc === 'true' ? 'DESC' : 'ASC'}
         LIMIT ${limit}
       `;
     } else if (sort === 'parent_tree') {
+      let parentTreeSinceExpr = '';
+      if (since) {
+        parentTreeSinceExpr = `
+        AND path ${desc === 'true' ? '<' : '>'} (
+          SELECT path FROM ${this.table}
+          WHERE id = '${since}'
+        )
+        `;
+      }
+
       query.text = `
         WITH parents AS (
-          SELECT * FROM ${this.table}
+          SELECT id FROM ${this.table}
           WHERE thread = (
             SELECT id FROM threads
             WHERE slug = '${slugOrId}'
             ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+            LIMIT 1
           )
           AND parent = 0
+          ${parentTreeSinceExpr}
+          ORDER BY created
           LIMIT ${limit}
         )
         SELECT * FROM ${this.table}

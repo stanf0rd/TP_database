@@ -40,7 +40,7 @@ class Thread {
     const desc = 'desc' in parsedOptions ? parsedOptions.desc : null;
     const since = 'since' in parsedOptions ? parsedOptions.since : null;
 
-    let sinceExpr;
+    let sinceExpr = '';
     if (since) {
       sinceExpr = desc === 'true'
         ? `AND created <= '${since}'`
@@ -51,7 +51,7 @@ class Thread {
       text: `
         SELECT * FROM ${this.table}
         WHERE ${key}='${value}'
-        ${sinceExpr || ''}
+        ${sinceExpr}
         ORDER BY created ${desc === 'true' ? 'DESC' : 'ASC'}
         ${limit ? `LIMIT ${limit}` : ''}
         `,
