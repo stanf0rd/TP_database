@@ -93,7 +93,6 @@ class Post {
         )
         `;
       }
-
       query.text = `
         SELECT *
         FROM posts
@@ -110,14 +109,20 @@ class Post {
     } else if (sort === 'parent_tree') {
       let parentTreeSinceExpr = '';
       if (since) {
-        parentTreeSinceExpr = `
-        AND path ${desc === 'true' ? '<' : '>'} (
-          SELECT path FROM ${this.table}
-          WHERE id = '${since}'
-        )
-        `;
+        if (desc === 'true') {
+          parentTreeSinceExpr = `
+          AND path < (
+            SELECT path[1:1] FROM ${this.table}
+            WHERE id = '${since}'
+          )`;
+        } else {
+          parentTreeSinceExpr = `
+          AND path > (
+            SELECT path FROM ${this.table}
+            WHERE id = '${since}'
+          )`;
+        }
       }
-
       query.text = `
         WITH parents AS (
           SELECT id FROM ${this.table}
@@ -129,7 +134,7 @@ class Post {
           )
           AND parent = 0
           ${parentTreeSinceExpr}
-          ORDER BY created
+          ORDER BY id ${desc === 'true' ? 'DESC' : 'ASC'}
           LIMIT ${limit}
         )
         SELECT * FROM ${this.table}
@@ -141,8 +146,6 @@ class Post {
     } else {
       throw new Error('Unknown sort type');
     }
-
-    console.log(query.text);
 
     const { err, result } = await db.makeQuery(query);
     if (err) return (err);
