@@ -58,6 +58,7 @@ CREATE TABLE posts (
   parent     integer    DEFAULT 0   REFERENCES posts (id),
   author     citext     NOT NULL    REFERENCES "users" (nickname),
   message    text       NOT NULL,
+  path       integer[]  NOT NULL,
   isEdited   boolean    NOT NULL    DEFAULT false,
   forum      citext     NOT NULL    REFERENCES forums (slug),
   thread     integer    NOT NULL    REFERENCES threads (id),
@@ -85,5 +86,5 @@ VALUES (0, 0, 0, 0, 0);
 INSERT INTO threads (id, title, author, forum, message)
 VALUES (0, 0, 0, 0, 0);
 
-INSERT INTO posts (id, parent, author, message, forum, thread)
-VALUES (0, 0, 0, 0, 0, 0);
+INSERT INTO posts (id, parent, path, author, message, forum, thread)
+VALUES (0, 0, '{}', 0, 0, 0, 0);
