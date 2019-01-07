@@ -15,12 +15,49 @@ class Post {
     ];
   }
 
-  async create(slugOrId, posts) {
+  async get(id) {
+    const query = {
+      text: `
+        SELECT * FROM ${this.table}
+        WHERE id = '${id}'
+        LIMIT 1
+      `,
+    };
+
+    const { err, result } = await db.makeQuery(query);
+    if (err) return { err };
+    return { post: result.rows[0] };
+  }
+
+  async update(id, message) {
+    const query = {
+      text: `
+        UPDATE ${this.table}
+        SET
+          message = '${message}',
+          "isEdited" = true
+        WHERE id = '${id}'
+        RETURNING *
+      `,
+    };
+
+    const { err, result } = await db.makeQuery(query);
+    if (err) return { err };
+    return { post: result.rows[0] };
+  }
+
+  async create(id, posts) {
     let values = '';
     posts.forEach((post) => {
+      const parent = post.parent ? `
+        (SELECT id FROM ${this.table}
+        WHERE id = ${post.parent}
+        AND thread = (SELECT id FROM thread))`
+        : 'DEFAULT';
+
       values += `(
         (SELECT nextval('posts_id_seq')::integer),
-        ${post.parent || 'DEFAULT'},
+        ${parent},
         (SELECT path FROM posts WHERE id = ${post.parent || '0'}) ||
         (SELECT currval('posts_id_seq')::integer),
         '${post.author}',
@@ -36,8 +73,7 @@ class Post {
         WITH thread AS (
           SELECT id, forum
           FROM threads
-          WHERE slug = '${slugOrId}'
-          ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+          WHERE id = '${id}'
           LIMIT 1
         )
         INSERT INTO ${this.table} (${this.columns.join(', ')})
@@ -45,14 +81,12 @@ class Post {
       `,
     };
 
-    // console.log(query.text);
-
     const { err, result } = await db.makeQuery(query);
     if (err) return { err };
     return { posts: result.rows };
   }
 
-  async get(slugOrId, options) {
+  async getFromThread(slugOrId, options) {
     const parsedOptions = options || {};
     const limit = 'limit' in parsedOptions ? parsedOptions.limit : 100;
     const desc = 'desc' in parsedOptions ? parsedOptions.desc : null;
