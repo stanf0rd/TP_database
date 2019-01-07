@@ -6,18 +6,18 @@ class Database {
   constructor() {
     this.pool = new Pool();
 
-    fs.readFile(
-      './src/utils/schema.sql',
-      'utf8',
-      async (err, content) => {
-        if (!err) {
-          const query = { text: content };
-          const { error } = await this.makeQuery(query);
-          if (error) throw new Error('Cannot create tables', error);
-          else console.log('Database ready');
-        }
-      },
-    );
+    // fs.readFile(
+    //   './src/utils/schema.sql',
+    //   'utf8',
+    //   async (err, content) => {
+    //     if (!err) {
+    //       const query = { text: content };
+    //       const { error } = await this.makeQuery(query);
+    //       if (error) throw new Error('Cannot create tables', error);
+    //       else console.log('Database ready');
+    //     }
+    //   },
+    // );
   }
 
   async makeQuery(query) {
