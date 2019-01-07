@@ -58,7 +58,6 @@ class Thread {
 
     const { err, result } = await db.makeQuery(query);
     if (err) return { err };
-
     return { threads: result.rows };
   }
 
