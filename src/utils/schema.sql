@@ -60,11 +60,11 @@ CREATE UNIQUE INDEX index_on_threads_id
 -- posts
 CREATE TABLE posts (
   id         serial     NOT NULL    PRIMARY KEY,
-  parent     integer    DEFAULT 0   REFERENCES posts (id),
+  parent     integer    NOT NULL    REFERENCES posts (id)    DEFAULT 0,
   author     citext     NOT NULL    REFERENCES "users" (nickname),
   message    text       NOT NULL,
   path       integer[]  NOT NULL,
-  isEdited   boolean    NOT NULL    DEFAULT false,
+  "isEdited" boolean    NOT NULL    DEFAULT false,
   forum      citext     NOT NULL    REFERENCES forums (slug),
   thread     integer    NOT NULL    REFERENCES threads (id),
   created  timestamptz  NOT NULL    DEFAULT CURRENT_TIMESTAMP
