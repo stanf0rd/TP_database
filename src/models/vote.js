@@ -11,8 +11,8 @@ class Vote {
       text: `
         SELECT * FROM ${this.table}
         WHERE "user" = '${user}'
-        AND forum = (
-          SELECT slug
+        AND thread = (
+          SELECT id
           FROM threads
           WHERE slug = '${slugOrId}'
           ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
@@ -31,13 +31,13 @@ class Vote {
         INSERT INTO ${this.table}
         VALUES (
           '${user}', (
-            SELECT slug
+            SELECT id
             FROM threads
             WHERE slug = '${slugOrId}'
             ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
           ), '${voice}'
         )
-        ON CONFLICT ("user", forum)
+        ON CONFLICT ("user", thread)
         DO UPDATE SET vote = ${voice}
         RETURNING *
       `,

@@ -80,9 +80,9 @@ CREATE UNIQUE INDEX index_on_posts_id
 -- votes
 CREATE TABLE votes (
   "user"     citext     NOT NULL    REFERENCES "users" (nickname),
-  forum      citext     NOT NULL    REFERENCES threads (slug),
+  thread     integer    NOT NULL    REFERENCES threads (id),
   vote       integer    NOT NULL    DEFAULT 0,
-  PRIMARY KEY ("user", forum)
+  PRIMARY KEY ("user", thread)
 );
 
 
