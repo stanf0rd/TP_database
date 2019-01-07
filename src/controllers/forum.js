@@ -77,6 +77,23 @@ exports.threads = async (req, res) => {
 
 
 exports.users = async (req, res) => {
-  res.code(600);
-  res.send();
+  const { slug } = req.params;
+
+  const { err, users } = await Forum.getUsers(slug, req.query);
+  if (err) {
+    console.log(err);
+    throw new Error('Unable to get users');
+  }
+
+  if (!users.length) {
+    const { forums } = await Forum.get('slug', slug);
+    if (!forums.length) {
+      res.code(404);
+      res.send({ message: 'No such users' });
+      return;
+    }
+  }
+
+  res.code(200);
+  res.send(users);
 };
