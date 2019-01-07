@@ -6,7 +6,15 @@ const routes = require('./routes');
 
 const service = fastify();
 service.use(morgan('dev'));
-
+service.addContentTypeParser(
+  'application/json',
+  { parseAs: 'buffer' },
+  (req, body, done) => {
+    if (body.length > 0) {
+      done(null, JSON.parse(body));
+    } else done(null, {});
+  },
+);
 
 routes.forEach((route) => {
   const { method, url, func } = route;
