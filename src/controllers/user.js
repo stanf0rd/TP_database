@@ -32,8 +32,11 @@ exports.create = async (req, res) => {
 
 exports.get = async (req, res) => {
   const { nickname } = req.params;
-  const { err, users } = await User.get('nickname', nickname);
-  if (err) throw new Error('Unable to get user', err);
+  const { err, users } = await User.get('nickname', nickname, { limit: 1 });
+  if (err) {
+    console.log(err);
+    throw new Error('Unable to get user');
+  }
 
   if (!users.length) {
     res.code(404);
