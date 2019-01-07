@@ -155,3 +155,19 @@ $new_thread$ LANGUAGE plpgsql;
 
 CREATE TRIGGER new_thread AFTER INSERT ON threads
     FOR EACH ROW EXECUTE PROCEDURE new_thread();
+
+
+-- update post trigger
+DROP FUNCTION IF EXISTS check_update_post;
+
+CREATE FUNCTION check_update_post() RETURNS trigger AS $check_update_post$
+    BEGIN
+        IF OLD.message <> NEW.message THEN
+            NEW."isEdited" = true;
+        END IF;
+        RETURN NEW;
+    END;
+$check_update_post$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_update_post BEFORE UPDATE ON posts
+    FOR EACH ROW EXECUTE PROCEDURE check_update_post();

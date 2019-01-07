@@ -34,8 +34,7 @@ class Post {
       text: `
         UPDATE ${this.table}
         SET
-          message = '${message}',
-          "isEdited" = true
+          message = '${message}'
         WHERE id = '${id}'
         RETURNING *
       `,
