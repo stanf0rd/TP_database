@@ -1,9 +1,9 @@
 const Post = require('../controllers/post');
 
 const postRoutes = [
-  { method: 'get', url: '/post/:id/details', func: () => null },
+  { method: 'get', url: '/post/:id/details', func: Post.get },
   // Получение информации о ветке обсуждения
-  { method: 'post', url: '/post/:id/details', func: () => null },
+  { method: 'post', url: '/post/:id/details', func: Post.update },
   // Изменение сообщения
 ];
 
