@@ -5,6 +5,7 @@ https://stackoverflow.com/questions/15981197/postgresql-error-type-citext-does-n
 CREATE EXTENSION IF NOT EXISTS citext;
 
 -- drop all
+DROP TABLE IF EXISTS user_posts;
 DROP TABLE IF EXISTS votes;
 DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS threads;
@@ -20,9 +21,11 @@ CREATE TABLE "users" (
   about      text       NOT NULL
 );
 
-DROP INDEX IF EXISTS index_on_users_email;
 CREATE UNIQUE INDEX index_on_users_email
   ON "users" (email);
+
+CREATE UNIQUE INDEX index_on_users_nickname
+  ON "users" (nickname);
 
 
 -- forums
@@ -47,9 +50,11 @@ CREATE TABLE threads (
   created  timestamptz  NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );
 
-DROP INDEX IF EXISTS index_on_threads_slug;
 CREATE UNIQUE INDEX index_on_threads_slug
   ON threads (slug);
+
+CREATE UNIQUE INDEX index_on_threads_id
+  ON threads (id);
 
 
 -- posts
@@ -65,11 +70,9 @@ CREATE TABLE posts (
   created  timestamptz  NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );
 
-DROP INDEX IF EXISTS index_on_posts_path;
 CREATE UNIQUE INDEX index_on_posts_path
   ON posts (path);
 
-DROP INDEX IF EXISTS index_on_posts_id;
 CREATE UNIQUE INDEX index_on_posts_id
   ON posts (id);
 
@@ -81,6 +84,20 @@ CREATE TABLE votes (
   vote       integer    NOT NULL    DEFAULT 0,
   PRIMARY KEY ("user", forum)
 );
+
+
+-- user_posts
+CREATE TABLE user_posts (
+  "user"     citext     NOT NULL    REFERENCES "users" (nickname),
+  forum      citext     NOT NULL    REFERENCES forums (slug),
+  PRIMARY KEY ("user", forum)
+);
+
+CREATE INDEX index_on_user_posts_user
+  ON user_posts ("user");
+
+CREATE INDEX index_on_user_posts_forum
+  ON user_posts (forum);
 
 
 -- default rows
@@ -106,15 +123,16 @@ CREATE FUNCTION new_post() RETURNS trigger AS $new_post$
            SET posts = posts + 1
          WHERE slug = NEW.forum;
 
-        -- UPDATE threads
-          --  SET posts = posts + 1
-        --  WHERE id = NEW.thread;
+        INSERT INTO user_posts ("user", forum)
+        VALUES (NEW.author, NEW.forum)
+            ON CONFLICT DO NOTHING;
+
 
         RETURN NEW;
     END;
 $new_post$ LANGUAGE plpgsql;
 
-CREATE TRIGGER new_post BEFORE INSERT ON posts
+CREATE TRIGGER new_post AFTER INSERT ON posts
     FOR EACH ROW EXECUTE PROCEDURE new_post();
 
 
@@ -127,9 +145,13 @@ CREATE FUNCTION new_thread() RETURNS trigger AS $new_thread$
            SET threads = threads + 1
          WHERE slug = NEW.forum;
 
+        INSERT INTO user_posts ("user", forum)
+        VALUES (NEW.author, NEW.forum)
+            ON CONFLICT DO NOTHING;
+
         RETURN NEW;
     END;
 $new_thread$ LANGUAGE plpgsql;
 
-CREATE TRIGGER new_thread BEFORE INSERT ON threads
+CREATE TRIGGER new_thread AFTER INSERT ON threads
     FOR EACH ROW EXECUTE PROCEDURE new_thread();
