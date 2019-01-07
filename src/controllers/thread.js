@@ -54,14 +54,38 @@ exports.createPosts = async (req, res) => {
   const newPosts = req.body;
   const { slugOrId } = req.params;
 
+  const check = await Thread.details(slugOrId);
+  if (check.err) {
+    console.log(check.err);
+    throw new Error('Unable to get thread');
+  }
+
+  if (!check.thread) {
+    res.code(404);
+    res.send({ message: 'No such thread' });
+    return;
+  }
+
   if (newPosts.length === 0) {
     res.code(201);
     res.send([]);
     return;
   }
 
-  const { err, posts } = await Post.create(slugOrId, newPosts);
+  const { err, posts } = await Post.create(check.thread.id, newPosts);
   if (err) {
+    if (err.code === '23502') {
+      res.code(409);
+      res.send({ message: 'Parent conflict' });
+      return;
+    }
+
+    if (err.code === '23503') {
+      res.code(404);
+      res.send({ message: 'No such user' });
+      return;
+    }
+
     console.log(err);
     throw new Error('Unable to create posts');
   }
@@ -120,7 +144,7 @@ exports.details = async (req, res) => {
 exports.posts = async (req, res) => {
   const { slugOrId } = req.params;
 
-  const { err, posts } = await Post.get(slugOrId, req.query);
+  const { err, posts } = await Post.getFromThread(slugOrId, req.query);
 
   if (err) {
     console.log(err);
