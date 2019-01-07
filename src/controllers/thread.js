@@ -108,8 +108,18 @@ exports.vote = async (req, res) => {
   }
 
   const upd = await Vote.addVote(slugOrId, nickname, voice);
-  if (upd.error) {
-    console.log(upd.error);
+  if (upd.err) {
+    if (upd.err.code === '23502') {
+      res.code(404);
+      res.send({ message: 'No such thread' });
+      return;
+    }
+    if (upd.err.code === '23503') {
+      res.code(404);
+      res.send({ message: 'No such user' });
+      return;
+    }
+    console.log(upd.err);
     throw new Error('Cannot add new or update vote');
   }
 
@@ -136,6 +146,12 @@ exports.details = async (req, res) => {
     throw new Error('Unable to get thread details');
   }
 
+  if (!thread) {
+    res.code(404);
+    res.send({ message: 'No sucn thread' });
+    return;
+  }
+
   res.code(200);
   res.send(thread);
 };
@@ -149,6 +165,18 @@ exports.posts = async (req, res) => {
   if (err) {
     console.log(err);
     throw new Error('Unable to get thread posts');
+  }
+  // TODO: exists
+  if (posts.length === 0) {
+    const check = await Thread.details(slugOrId);
+    if (check.err) {
+      console.log(check.err);
+      throw new Error('Unable to get threads');
+    }
+    if (!check.thread) {
+      res.code(404);
+      res.send({ message: 'No such thread' });
+    }
   }
 
   res.code(200);
@@ -175,6 +203,12 @@ exports.update = async (req, res) => {
   if (err) {
     console.log(err);
     throw new Error('Unable to update thread');
+  }
+
+  if (!thread) {
+    res.code(404);
+    res.send({ message: 'No such thread' });
+    return;
   }
 
   res.code(200);
