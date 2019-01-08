@@ -51,12 +51,7 @@ class Post {
       `,
     };
 
-    console.log(query.text);
-
     const { err, result } = await db.makeQuery(query);
-
-    console.log(err, result);
-
     if (err) return { err };
     return { data: result.rows[0] };
   }
