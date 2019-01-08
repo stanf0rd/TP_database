@@ -15,18 +15,50 @@ class Post {
     ];
   }
 
-  async get(id) {
+  async get(id, related) {
+    const search = related ? `posts.*
+      ${related.includes('user') ? ', "users".*' : ''}
+      ${related.includes('forum') ? ', forums.*' : ''}
+      ${related.includes('thread') ? `
+        , threads.id AS threadid
+        , threads.title AS threadtitle
+        , threads.author AS threadauthor
+        , threads.forum AS threadforum
+        , threads.message AS threadmessage
+        , threads.votes
+        , threads.slug AS threadslug
+        , threads.created AS threadcreated
+      ` : ''}
+    ` : 'posts.*';
+
+    const vars = related ? `
+      ${related.includes('user') ? `
+        LEFT JOIN "users" ON "users".nickname = ${this.table}.author
+      ` : ''}
+      ${related.includes('thread') ? `
+        LEFT JOIN threads ON threads.id = ${this.table}.thread
+      ` : ''}
+      ${related.includes('forum') ? `
+        LEFT JOIN forums ON forums.slug = ${this.table}.forum
+      ` : ''}
+    ` : '';
+
     const query = {
       text: `
-        SELECT * FROM ${this.table}
-        WHERE id = '${id}'
-        LIMIT 1
+        SELECT ${search} FROM ${this.table}
+        ${vars || ''}
+        WHERE ${this.table}.id = ${id} LIMIT 1
       `,
     };
 
+    console.log(query.text);
+
     const { err, result } = await db.makeQuery(query);
+
+    console.log(err, result);
+
     if (err) return { err };
-    return { post: result.rows[0] };
+    return { data: result.rows[0] };
   }
 
   async update(id, message) {
