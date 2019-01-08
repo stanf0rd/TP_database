@@ -44,9 +44,6 @@ exports.clear = async () => {
 
   const { err } = await db.makeQuery(query);
 
-  console.log(err);
-  
-
   if (err) return { err };
   return { status: 'ok' };
 };
