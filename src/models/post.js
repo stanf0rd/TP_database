@@ -171,9 +171,9 @@ class Post {
           LIMIT ${limit}
         )
         SELECT * FROM ${this.table}
-        WHERE path[1] IN (SELECT id FROM parents)
+        WHERE root IN (SELECT id FROM parents)
         ORDER BY
-          path[1] ${desc === 'true' ? 'DESC' : 'ASC'},
+          root ${desc === 'true' ? 'DESC' : 'ASC'},
           path ASC
       `;
     } else {

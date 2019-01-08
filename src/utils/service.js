@@ -37,12 +37,15 @@ exports.clear = async () => {
       INSERT INTO threads (id, title, author, forum, message)
       VALUES (0, 0, 0, 0, 0);
 
-      INSERT INTO posts (id, parent, path, author, message, forum, thread)
-      VALUES (0, 0, '{}', 0, 0, 0, 0);
+      INSERT INTO posts (id, parent, root, path, author, message, forum, thread)
+      VALUES (0, 0, 0, '{}', 0, 0, 0, 0);
     `,
   };
 
   const { err } = await db.makeQuery(query);
+
+  console.log(err);
+  
 
   if (err) return { err };
   return { status: 'ok' };

@@ -63,6 +63,7 @@ CREATE INDEX index_on_threads_forum
 CREATE TABLE posts (
   id         serial     NOT NULL    PRIMARY KEY,
   parent     integer    NOT NULL    REFERENCES posts (id)    DEFAULT 0,
+  root       integer    NOT NULL,
   author     citext     NOT NULL    REFERENCES "users" (nickname),
   message    text       NOT NULL,
   path       integer[]  NOT NULL,
@@ -74,6 +75,9 @@ CREATE TABLE posts (
 
 CREATE INDEX index_on_post_thread
   ON posts(thread);
+
+CREATE INDEX index_on_posts_root
+  ON posts (root);
 
 CREATE UNIQUE INDEX index_on_posts_path
   ON posts (path);
@@ -115,8 +119,8 @@ VALUES (0, 0, 0, 0, 0);
 INSERT INTO threads (id, title, author, forum, message)
 VALUES (0, 0, 0, 0, 0);
 
-INSERT INTO posts (id, parent, path, author, message, forum, thread)
-VALUES (0, 0, '{}', 0, 0, 0, 0);
+INSERT INTO posts (id, root, parent, path, author, message, forum, thread)
+VALUES (0, 0, 0, '{}', 0, 0, 0, 0);
 
 
 -- new post trigger
@@ -132,12 +136,15 @@ CREATE FUNCTION new_post() RETURNS trigger AS $new_post$
         VALUES (NEW.author, NEW.forum)
             ON CONFLICT DO NOTHING;
 
+        IF array_length(NEW.path, 1) > 0 THEN
+          NEW.root = NEW.path[1];
+        END IF;
 
         RETURN NEW;
     END;
 $new_post$ LANGUAGE plpgsql;
 
-CREATE TRIGGER new_post AFTER INSERT ON posts
+CREATE TRIGGER new_post BEFORE INSERT ON posts
     FOR EACH ROW EXECUTE PROCEDURE new_post();
 
 
