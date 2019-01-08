@@ -13,6 +13,7 @@ exports.create = async (req, res) => {
     userData.nickname, userData.email,
   );
   if (conflicted.err) {
+    console.log(conflicted.err);
     throw new Error('Unable to find conflicts', conflicted.err);
   }
 

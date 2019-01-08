@@ -25,7 +25,6 @@ class User {
     };
 
     const { err } = await db.makeQuery(query);
-
     return { err, user };
   }
 
@@ -40,7 +39,6 @@ class User {
     };
 
     const { err, result } = await db.makeQuery(query);
-
     return { err, users: result.rows };
   }
 

@@ -1,4 +1,3 @@
-const fs = require('fs');
 const { Pool } = require('pg');
 
 
@@ -7,7 +6,7 @@ class Database {
     this.pool = new Pool({
       user: 'forum_app',
       host: 'localhost',
-      database: 'forum_db',
+      database: 'postgres',
       password: 'password',
       port: 5432,
     });
