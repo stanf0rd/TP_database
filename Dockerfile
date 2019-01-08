@@ -28,10 +28,4 @@ RUN npm install
 EXPOSE 5000
 
 
-CMD service postgresql start &&\
-PGUSER=forum_app \
-PGHOST=localhost \
-PGPASSWORD=password \
-PGDATABASE=forum_db \
-PGPORT=5432 \
-node src/server.js
+CMD service postgresql start && node src/server.js
