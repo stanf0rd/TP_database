@@ -46,15 +46,6 @@ class User {
   async get(key, value, options) {
     const parsedOptions = options || {};
     const limit = 'limit' in parsedOptions ? parsedOptions.limit : null;
-    // const desc = 'desc' in parsedOptions ? parsedOptions.desc : null;
-    // const since = 'since' in parsedOptions ? parsedOptions.since : null;
-
-    // let sinceExpr = '';
-    // if (since) {
-    //   sinceExpr = desc === 'true'
-    //     ? `AND nickname < '${since}'`
-    //     : `AND nickname > '${since}'`;
-    // }
 
     const query = {
       text: `
@@ -66,7 +57,6 @@ class User {
 
     const { err, result } = await db.makeQuery(query);
     if (err) return { err };
-
     return { users: result.rows };
   }
 
