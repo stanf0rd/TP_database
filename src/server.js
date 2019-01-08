@@ -18,7 +18,7 @@ service.addContentTypeParser(
 
 routes.forEach((route) => {
   const { method, url, func } = route;
-  service[method](`${url}`, func);
+  service[method](`/api${url}`, func);
 });
 
 
