@@ -1,7 +1,4 @@
 const Post = require('../models/post');
-const User = require('../models/user');
-const Forum = require('../models/forum');
-const Thread = require('../models/thread');
 
 
 exports.get = async (req, res) => {
@@ -10,69 +7,70 @@ exports.get = async (req, res) => {
 
   related = related ? related.split(',') : null;
 
-  const { err, post } = await Post.get(id, related);
+  const { err, data } = await Post.get(id, related);
   if (err) {
     console.log(err);
     throw new Error('Unable to get post');
   }
 
-  if (!post) {
+  if (!data) {
     res.code(404);
     res.send({ message: 'No such post' });
     return;
   }
 
-  const result = { post };
+  const post = {
+    id: data.id,
+    parent: data.parent,
+    root: data.root,
+    author: data.author,
+    message: data.message,
+    path: data.path,
+    isEdited: data.isEdited,
+    forum: data.forum,
+    thread: data.thread,
+    created: data.created,
+  };
 
-  if (related !== null) {
-    const promises = [];
-
-    if (related.includes('user')) {
-      promises.push(
-        User
-          .get('nickname', post.author)
-          .then(({ err: error, users }) => {
-            if (error) {
-              console.log(error);
-              throw new Error('Unable to get author');
-            }
-            [result.author] = users;
-          }),
-      );
-    }
-
-    if (related.includes('forum')) {
-      promises.push(
-        Forum
-          .get('slug', post.forum)
-          .then(({ err: error, forums }) => {
-            if (error) {
-              console.log(error);
-              throw new Error('Unable to get forum');
-            }
-            [result.forum] = forums;
-          }),
-      );
-    }
-
-    if (related.includes('thread')) {
-      promises.push(Thread.get('id', post.thread));
-
-      promises.push(
-        Thread
-          .get('id', post.thread)
-          .then(({ err: error, threads }) => {
-            if (error) {
-              console.log(error);
-              throw new Error('Unable to get thread');
-            }
-            [result.thread] = threads;
-          }),
-      );
-    }
-
-    await Promise.all(promises);
+  let author = null;
+  if (related && related.includes('user')) {
+    author = {
+      nickname: data.nickname,
+      email: data.email,
+      fullname: data.fullname,
+      about: data.about,
+    };
   }
+
+  let thread = null;
+  if (related && related.includes('thread')) {
+    thread = {
+      id: data.threadid,
+      title: data.threadtitle,
+      author: data.threadauthor,
+      forum: data.threadforum,
+      message: data.threadmessage,
+      votes: data.votes,
+      slug: data.threadslug,
+      created: data.threadcreated,
+    };
+  }
+
+  let forum = null;
+  if (related && related.includes('forum')) {
+    forum = {
+      title: data.title,
+      slug: data.slug,
+      user: data.user,
+      posts: data.posts,
+      threads: data.threads,
+    };
+  }
+
+  const result = { post };
+  if (thread) result.thread = thread;
+  if (author) result.author = author;
+  if (forum) result.forum = forum;
 
   res.code(200);
   res.send(result);
@@ -84,14 +82,16 @@ exports.update = async (req, res) => {
   const { message } = req.body;
 
   if (!message) {
-    const { err, post } = await Post.get(id);
+    console.log('no message');
+    const { err, data } = await Post.get(id);
     if (err) {
       console.log(err);
       throw new Error('Unable to get post');
     }
 
     res.code(200);
-    res.send(post);
+    res.send(data);
+    return;
   }
 
   const { err, post } = await Post.update(id, message);
