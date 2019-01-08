@@ -1,0 +1,6 @@
+.git
+.eslinrc.json
+.gitignore
+start.sh
+node_modules
+npm-debug
