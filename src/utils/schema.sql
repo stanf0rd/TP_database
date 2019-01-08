@@ -56,6 +56,8 @@ CREATE UNIQUE INDEX index_on_threads_slug
 CREATE UNIQUE INDEX index_on_threads_id
   ON threads (id);
 
+CREATE INDEX index_on_threads_forum
+  ON threads (forum);
 
 -- posts
 CREATE TABLE posts (
@@ -69,6 +71,9 @@ CREATE TABLE posts (
   thread     integer    NOT NULL    REFERENCES threads (id),
   created  timestamptz  NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX index_on_post_thread
+  ON posts(thread);
 
 CREATE UNIQUE INDEX index_on_posts_path
   ON posts (path);
