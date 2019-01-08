@@ -65,6 +65,8 @@ CREATE INDEX index_on_threads_forum
 CREATE INDEX index_on_threads_created
   ON threads (created);
 
+CREATE INDEX index_on_threads_created_forum
+  ON threads (forum, created);
 
 -- posts
 CREATE TABLE posts (
