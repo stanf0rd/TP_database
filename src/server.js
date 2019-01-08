@@ -1,11 +1,11 @@
 const fastify = require('fastify');
-const morgan  = require('morgan');
+// const morgan  = require('morgan');
 
 const routes = require('./routes');
 
 
 const service = fastify();
-service.use(morgan('dev'));
+// service.use(morgan('dev'));
 service.addContentTypeParser(
   'application/json',
   { parseAs: 'buffer' },
