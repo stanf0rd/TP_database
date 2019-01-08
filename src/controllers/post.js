@@ -82,7 +82,6 @@ exports.update = async (req, res) => {
   const { message } = req.body;
 
   if (!message) {
-    console.log('no message');
     const { err, data } = await Post.get(id);
     if (err) {
       console.log(err);
