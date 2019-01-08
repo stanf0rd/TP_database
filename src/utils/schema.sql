@@ -27,6 +27,9 @@ CREATE UNIQUE INDEX index_on_users_email
 CREATE UNIQUE INDEX index_on_users_nickname
   ON "users" (nickname);
 
+CREATE UNIQUE INDEX index_on_users_nickname_c
+  ON "users" (nickname COLLATE "C");
+
 
 -- forums
 CREATE TABLE forums (
@@ -58,6 +61,10 @@ CREATE UNIQUE INDEX index_on_threads_id
 
 CREATE INDEX index_on_threads_forum
   ON threads (forum);
+
+CREATE INDEX index_on_threads_created
+  ON threads (created);
+
 
 -- posts
 CREATE TABLE posts (

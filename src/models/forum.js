@@ -74,6 +74,8 @@ class Forum {
       `,
     };
 
+    // console.log(query.text);
+
     const { err, result } = await db.makeQuery(query);
     if (err) return { err };
     return { users: result.rows };
