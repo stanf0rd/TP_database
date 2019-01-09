@@ -3,15 +3,13 @@ const { Pool } = require('pg');
 
 class Database {
   constructor() {
-    this.pool = new Pool(
-    //   {
-    //   user: 'forum_app',
-    //   host: 'localhost',
-    //   database: 'postgres',
-    //   password: 'password',
-    //   port: 5432,
-    // }
-    );
+    this.pool = new Pool({
+      user: 'forum_app',
+      host: 'localhost',
+      database: 'postgres',
+      password: 'password',
+      port: 5432,
+    });
 
     // fs.readFile(
     //   './src/utils/schema.sql',
