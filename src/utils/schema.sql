@@ -77,8 +77,8 @@ CREATE TABLE votes (
 
 -- user_posts
 CREATE TABLE user_posts (
-  "user"     citext     NOT NULL    REFERENCES "users" (nickname),
-  forum      citext     NOT NULL    REFERENCES forums (slug),
+  "user"     citext     NOT NULL,
+  forum      citext     NOT NULL,
   PRIMARY KEY ("user", forum)
 );
 
