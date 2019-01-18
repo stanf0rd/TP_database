@@ -20,6 +20,12 @@ RUN /etc/init.d/postgresql start &&\
   psql < /opt/stanford-db/src/utils/schema.sql &&\
   /etc/init.d/postgresql stop
 
+RUN printf "\n\
+wal_level            = 'minimal' \n\
+max_wal_senders      = '0'       \n\
+log_min_messages     = 'panic'   \n" >> \
+    "/etc/postgresql/${PGVER}/main/postgresql.conf"
+
 USER root
 WORKDIR /opt/stanford-db
 
