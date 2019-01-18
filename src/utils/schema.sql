@@ -15,17 +15,11 @@ DROP TABLE IF EXISTS "users";
 
 -- users
 CREATE TABLE "users" (
-  nickname   citext     NOT NULL    PRIMARY KEY,
+  nickname   citext     NOT NULL,
   email      citext     NOT NULL,
   fullname   text       NOT NULL,
   about      text       NOT NULL
 );
-
-CREATE UNIQUE INDEX index_on_users_email
-  ON "users" (email);
-
-CREATE UNIQUE INDEX index_on_users_nickname
-  ON "users" (nickname);
 
 CREATE UNIQUE INDEX index_on_users_nickname_c
   ON "users" (nickname COLLATE "C");
@@ -56,43 +50,20 @@ CREATE TABLE threads (
 CREATE UNIQUE INDEX index_on_threads_slug
   ON threads (slug);
 
-CREATE UNIQUE INDEX index_on_threads_id
-  ON threads (id);
-
-CREATE INDEX index_on_threads_forum
-  ON threads (forum);
-
-CREATE INDEX index_on_threads_created
-  ON threads (created);
-
-CREATE INDEX index_on_threads_created_forum
-  ON threads (forum, created);
 
 -- posts
 CREATE TABLE posts (
   id         serial     NOT NULL    PRIMARY KEY,
-  parent     integer    NOT NULL    REFERENCES posts (id)    DEFAULT 0,
+  parent     integer    NOT NULL    DEFAULT 0,
   root       integer    NOT NULL,
   author     citext     NOT NULL    REFERENCES "users" (nickname),
   message    text       NOT NULL,
   path       integer[]  NOT NULL,
   "isEdited" boolean    NOT NULL    DEFAULT false,
-  forum      citext     NOT NULL    REFERENCES forums (slug),
-  thread     integer    NOT NULL    REFERENCES threads (id),
+  forum      citext     NOT NULL,
+  thread     integer    NOT NULL,
   created  timestamptz  NOT NULL    DEFAULT CURRENT_TIMESTAMP
 );
-
-CREATE INDEX index_on_post_thread
-  ON posts(thread);
-
-CREATE INDEX index_on_posts_root
-  ON posts (root);
-
-CREATE UNIQUE INDEX index_on_posts_path
-  ON posts (path);
-
-CREATE UNIQUE INDEX index_on_posts_id
-  ON posts (id);
 
 
 -- votes
@@ -110,12 +81,6 @@ CREATE TABLE user_posts (
   forum      citext     NOT NULL    REFERENCES forums (slug),
   PRIMARY KEY ("user", forum)
 );
-
-CREATE INDEX index_on_user_posts_user
-  ON user_posts ("user");
-
-CREATE INDEX index_on_user_posts_forum
-  ON user_posts (forum);
 
 
 -- default rows
@@ -192,3 +157,17 @@ $check_update_post$ LANGUAGE plpgsql;
 
 CREATE TRIGGER check_update_post BEFORE UPDATE ON posts
     FOR EACH ROW EXECUTE PROCEDURE check_update_post();
+
+
+
+CREATE INDEX index_on_posts_thread_id
+  ON posts (thread, id);
+
+CREATE INDEX index_on_posts_root_path
+  ON posts (root, path);
+
+CREATE INDEX index_on_user_posts_forum
+  ON user_posts (forum);
+
+CREATE INDEX index_on_threads_forum_created
+  ON threads (forum, created);
