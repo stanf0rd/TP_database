@@ -14,8 +14,8 @@ class Vote {
         AND thread = (
           SELECT id
           FROM threads
-          WHERE slug = '${slugOrId}'
-          ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+          WHERE ${Number.isInteger(Number(slugOrId)) ? 'id' : 'slug'} = '${slugOrId}'
+          LIMIT 1
         )
       `,
     };
@@ -33,8 +33,8 @@ class Vote {
           '${user}', (
             SELECT id
             FROM threads
-            WHERE slug = '${slugOrId}'
-            ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+            WHERE ${Number.isInteger(Number(slugOrId)) ? 'id' : 'slug'} = '${slugOrId}'
+            LIMIT 1
           ), '${voice}'
         )
         ON CONFLICT ("user", thread)

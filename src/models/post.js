@@ -78,7 +78,8 @@ class Post {
       const parent = post.parent ? `
         (SELECT id FROM ${this.table}
         WHERE id = ${post.parent}
-        AND thread = (SELECT id FROM thread))`
+        AND thread = (SELECT id FROM thread)
+        LIMIT 1)`
         : 'DEFAULT';
 
       values += `(
@@ -133,8 +134,7 @@ class Post {
         SELECT * FROM ${this.table}
         WHERE thread = (
           SELECT id FROM threads
-          WHERE slug = '${slugOrId}'
-          ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+          WHERE ${Number.isInteger(Number(slugOrId)) ? 'id' : 'slug'} = '${slugOrId}'
           LIMIT 1
         )
         ${sinceExpr}
@@ -158,8 +158,7 @@ class Post {
         FROM posts
         WHERE thread = (
           SELECT id FROM threads
-          WHERE slug = '${slugOrId}'
-          ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+          WHERE ${Number.isInteger(Number(slugOrId)) ? 'id' : 'slug'} = '${slugOrId}'
           LIMIT 1
         )
         ${treeSinceExpr}
@@ -188,8 +187,7 @@ class Post {
           SELECT id FROM ${this.table}
           WHERE thread = (
             SELECT id FROM threads
-            WHERE slug = '${slugOrId}'
-            ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+            WHERE ${Number.isInteger(Number(slugOrId)) ? 'id' : 'slug'} = '${slugOrId}'
             LIMIT 1
           )
           AND parent = 0
@@ -206,6 +204,8 @@ class Post {
     } else {
       throw new Error('Unknown sort type');
     }
+
+    // console.log(query.text);
 
     const { err, result } = await db.makeQuery(query);
     if (err) return (err);

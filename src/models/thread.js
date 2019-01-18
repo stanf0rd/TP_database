@@ -56,6 +56,8 @@ class Thread {
         `,
     };
 
+    // console.log(query.text);
+
     const { err, result } = await db.makeQuery(query);
     if (err) return { err };
     return { threads: result.rows };
@@ -66,8 +68,8 @@ class Thread {
     const query = {
       text: `
         SELECT * FROM ${this.table}
-        WHERE slug = '${slugOrId}'
-        ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+        WHERE ${Number.isInteger(Number(slugOrId)) ? 'id' : 'slug'} = '${slugOrId}'
+        LIMIT 1
       `,
     };
 
@@ -82,8 +84,7 @@ class Thread {
       text: `
         UPDATE ${this.table}
         SET votes = votes+${voice}
-        WHERE slug = '${slugOrId}'
-        ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+        WHERE ${Number.isInteger(Number(slugOrId)) ? 'id' : 'slug'} = '${slugOrId}'
         RETURNING *
       `,
     };
@@ -101,8 +102,7 @@ class Thread {
         SET
           ${title ? `title = '${title}'` : ''}${title && message ? ',' : ''}
           ${message ? `message = '${message}'` : ''}
-        WHERE slug = '${slugOrId}'
-        ${Number.isInteger(Number(slugOrId)) ? `OR id = '${slugOrId}'` : ''}
+        WHERE ${Number.isInteger(Number(slugOrId)) ? 'id' : 'slug'} = '${slugOrId}'
         RETURNING *
       `,
     };
