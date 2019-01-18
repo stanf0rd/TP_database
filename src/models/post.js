@@ -102,9 +102,13 @@ class Post {
           FROM threads
           WHERE id = '${id}'
           LIMIT 1
+        ), ins AS (
+          UPDATE forums
+          SET posts = posts + ${posts.length}
+          WHERE slug = (SELECT forum FROM thread)
         )
         INSERT INTO ${this.table} (${this.columns.join(', ')})
-        VALUES ${values} RETURNING *
+        VALUES ${values} RETURNING *;
       `,
     };
 

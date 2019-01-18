@@ -102,10 +102,6 @@ DROP FUNCTION IF EXISTS new_post;
 
 CREATE FUNCTION new_post() RETURNS trigger AS $new_post$
     BEGIN
-        UPDATE forums
-           SET posts = posts + 1
-         WHERE slug = NEW.forum;
-
         INSERT INTO user_posts ("user", forum)
         VALUES (NEW.author, NEW.forum)
             ON CONFLICT DO NOTHING;
