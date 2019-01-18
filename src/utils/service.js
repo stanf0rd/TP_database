@@ -21,12 +21,9 @@ exports.status = async () => {
 exports.clear = async () => {
   const query = {
     text: `
-      DELETE FROM   user_posts;
-      DELETE FROM        votes;
-      DELETE FROM        posts;
-      DELETE FROM      threads;
-      DELETE FROM       forums;
-      DELETE FROM      "users";
+      TRUNCATE TABLE
+        user_posts, votes, posts,
+        threads, forums, "users";
 
       INSERT INTO "users"
       VALUES (0, 0, 0, 0);
