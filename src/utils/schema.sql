@@ -84,6 +84,9 @@ CREATE TABLE user_posts (
 CREATE UNIQUE INDEX index_on_user_posts
   ON user_posts("user", forum);
 
+CREATE INDEX index_on_user_posts_forum
+  ON user_posts(forum);
+
 
 -- default rows
 INSERT INTO "users"
