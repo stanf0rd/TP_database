@@ -23,6 +23,7 @@ class Database {
     //     }
     //   },
     // );
+    this.userSet = new Set();
   }
 
   async makeQuery(query) {
