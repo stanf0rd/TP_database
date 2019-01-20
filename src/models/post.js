@@ -13,6 +13,7 @@ class Post {
       'thread',
       'forum',
     ];
+    this.userSet = db.userSet;
   }
 
   async get(id, related) {
@@ -72,44 +73,62 @@ class Post {
     return { post: result.rows[0] };
   }
 
-  async create(id, posts) {
+  async create(id, posts, forum) {
     let values = '';
+    let fuserValues = '';
+    let dollars = 1;
+    const data = [id];
     posts.forEach((post) => {
       const parent = post.parent ? `
         (SELECT id FROM ${this.table}
-        WHERE id = ${post.parent}
+        WHERE id = $${++dollars}
         AND thread = (SELECT id FROM thread)
         LIMIT 1)`
-        : 'DEFAULT';
+        : `$${++dollars}::integer`;
 
       values += `(
         (SELECT nextval('posts_id_seq')::integer),
         ${parent},
-        (SELECT path FROM posts WHERE id = ${post.parent || '0'}) ||
+        (SELECT path FROM posts WHERE id = $${dollars} LIMIT 1) ||
         (SELECT currval('posts_id_seq')::integer),
-        '${post.author}',
-        '${post.message}',
+        $${++dollars},
+        $${++dollars},
         (SELECT id FROM thread),
         (SELECT forum FROM thread)
       ), `;
+
+      if (!this.userSet.has(forum + post.author)) {
+        fuserValues += `(
+          $${dollars - 1},
+          (SELECT forum FROM thread)
+        ), `;
+        this.userSet.add(forum + post.author);
+      }
+
+      data.push(post.parent || 0, post.author, post.message);
     });
     values = values.slice(0, -2);
+    fuserValues = fuserValues.slice(0, -2);
 
     const query = {
       text: `
         WITH thread AS (
           SELECT id, forum
           FROM threads
-          WHERE id = '${id}'
+          WHERE id = $1
           LIMIT 1
-        ), ins AS (
+        ), inc_posts AS (
           UPDATE forums
           SET posts = posts + ${posts.length}
           WHERE slug = (SELECT forum FROM thread)
-        )
+        )${(fuserValues) ? `, ins_forum_users AS (
+          INSERT INTO user_posts ("user", forum)
+          VALUES ${fuserValues}
+        )` : ''}
         INSERT INTO ${this.table} (${this.columns.join(', ')})
-        VALUES ${values} RETURNING *;
+        VALUES ${values} RETURNING *
       `,
+      values: data,
     };
 
     const { err, result } = await db.makeQuery(query);
