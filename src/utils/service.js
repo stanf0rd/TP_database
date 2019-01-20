@@ -19,6 +19,7 @@ exports.status = async () => {
 
 
 exports.clear = async () => {
+  db.userSet.clear();
   const query = {
     text: `
       TRUNCATE TABLE
