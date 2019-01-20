@@ -72,7 +72,7 @@ exports.createPosts = async (req, res) => {
     return;
   }
 
-  const { err, posts } = await Post.create(check.thread.id, newPosts);
+  const { err, posts } = await Post.create(check.thread.id, newPosts, check.thread.forum);
   if (err) {
     if (err.code === '23502') {
       res.code(409);

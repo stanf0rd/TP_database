@@ -4,12 +4,14 @@ const db = require('../utils/database');
 class Thread {
   constructor() {
     this.table = 'threads';
+    this.userSet = db.userSet;
   }
 
 
   async create(threadData) {
     const columns = [];
     const values = [];
+    this.userSet.add(threadData.forum + threadData.author);
     Object.keys(threadData).forEach((key) => {
       columns.push(key);
       if (key === 'forum') {
