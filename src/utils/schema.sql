@@ -78,9 +78,11 @@ CREATE TABLE votes (
 -- user_posts
 CREATE TABLE user_posts (
   "user"     citext     NOT NULL,
-  forum      citext     NOT NULL,
-  PRIMARY KEY ("user", forum)
+  forum      citext     NOT NULL
 );
+
+CREATE UNIQUE INDEX index_on_user_posts
+  ON user_posts("user", forum);
 
 
 -- default rows
@@ -102,12 +104,8 @@ DROP FUNCTION IF EXISTS new_post;
 
 CREATE FUNCTION new_post() RETURNS trigger AS $new_post$
     BEGIN
-        INSERT INTO user_posts ("user", forum)
-        VALUES (NEW.author, NEW.forum)
-            ON CONFLICT DO NOTHING;
-
         IF array_length(NEW.path, 1) > 0 THEN
-          NEW.root = NEW.path[1];
+            NEW.root = NEW.path[1];
         END IF;
 
         RETURN NEW;
@@ -128,8 +126,14 @@ CREATE FUNCTION new_thread() RETURNS trigger AS $new_thread$
          WHERE slug = NEW.forum;
 
         INSERT INTO user_posts ("user", forum)
-        VALUES (NEW.author, NEW.forum)
-            ON CONFLICT DO NOTHING;
+        SELECT NEW.author, NEW.forum
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM user_posts
+            WHERE "user" = NEW.author
+            AND forum = NEW.forum
+            LIMIT 1
+        );
 
         RETURN NEW;
     END;
@@ -162,8 +166,8 @@ CREATE INDEX index_on_posts_thread_id
 CREATE INDEX index_on_posts_root_path
   ON posts (root, path);
 
-CREATE INDEX index_on_user_posts_forum
-  ON user_posts (forum);
+-- CREATE INDEX index_on_user_posts_forum
+--   ON user_posts (forum);
 
 CREATE INDEX index_on_threads_forum_created
   ON threads (forum, created);
