@@ -124,6 +124,7 @@ class Post {
         )${(fuserValues) ? `, ins_forum_users AS (
           INSERT INTO user_posts ("user", forum)
           VALUES ${fuserValues}
+          ON CONFLICT DO NOTHING
         )` : ''}
         INSERT INTO ${this.table} (${this.columns.join(', ')})
         VALUES ${values} RETURNING *
